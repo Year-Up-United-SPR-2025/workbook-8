@@ -1,6 +1,7 @@
-package com.pluralsight;
+package com.pluralsight.Example_Not_In_Book;
 
 import com.pluralsight.Color.ColorCodes;
+import com.pluralsight.sqlConnectionInfo;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -33,7 +34,7 @@ public class Main {
             while (true) {
                 // Display the main menu options to the user
                 System.out.println(ColorCodes.BRIGHT_BLUE + ColorCodes.BOLD +
-                        "\n🔎 What Info do you want to look at? 🔍\n" + ColorCodes.RESET);
+                        "\n📋 What Table do you want to look at?\n" + ColorCodes.RESET);
                 System.out.println(ColorCodes.BRIGHT_GREEN + "1) " + ColorCodes.RESET +
                         ColorCodes.GREEN + "📦 Display all products" + ColorCodes.RESET);
                 System.out.println(ColorCodes.BRIGHT_YELLOW + "2) " + ColorCodes.RESET +
