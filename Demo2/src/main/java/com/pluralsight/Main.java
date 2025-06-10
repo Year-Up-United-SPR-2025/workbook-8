@@ -1,13 +1,10 @@
 package com.pluralsight;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
-
 import java.sql.*;
-import javax.sql.DataSource;
 
 public class Main {
 
-    private static sqlConnectionInfo sqlConnectionInfo;
+    private static BasicDataSource basicDataSource;
 
     public static void main(String[] args) {
 
@@ -18,7 +15,7 @@ public class Main {
             System.exit(1);
         }
 
-        sqlConnectionInfo = getSqlConnectionInfoFromArgs(args);
+        basicDataSource = getBasicDataSourceFromArgs(args);
 
         try {
             displayCities(103);
@@ -26,70 +23,67 @@ public class Main {
             throw new RuntimeException(e);
         }
 
+
     }
 
-    public static sqlConnectionInfo getSqlConnectionInfoFromArgs(String[] args) {
-        // get the username and password from the command line args
+    public static BasicDataSource getBasicDataSourceFromArgs(String[] args) {
+        // get the user name and password from the command line args
         String username = args[0];
         String password = args[1];
 
         String connectionString = args[2];
 
-        return new sqlConnectionInfo(connectionString, username, password);
+        return new BasicDataSource(connectionString, username, password);
     }
 
 
-    public static void displayCities(int countryId) throws SQLException {
+    public static void displayCities(int countryId) throws SQLException, ClassNotFoundException {
 
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet results = null;
-
-        try {
-
-            // load the MySQL Driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-// 1. open a connection to the database
-// use the database URL to point to the correct database
-
-
-            connection = DriverManager.getConnection(
-                    sqlConnectionInfo.getConnectionString(),
-                    sqlConnectionInfo.getUsername(),
-                    sqlConnectionInfo.getPassword());
-
-
-            // define your query
-            String query = "SELECT city FROM city " +
-                    "WHERE country_id = ?";
-
-            // create statement
-// the statement is tied to the open connection
-
-            ps = connection.prepareStatement(query);
+        try (Connection connection = basicDataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT city FROM city WHERE country_id = ?");) {
             ps.setInt(1, countryId);
 
-
-// 2. Execute your query
-            results = ps.executeQuery();
-
-// process the results
-            while (results.next()) {
-                String city = results.getString("city");
-                System.out.println(city);
+            try (ResultSet results = ps.executeQuery()) {
+                while (results.next()) {
+                    String city = results.getString("city");
+                    System.out.println(city);
+                }
+            } finally {
+                //close the results ResultSet
             }
-// 3. Close the connection
 
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-
-            if (results != null) results.close();
-            if (ps != null) ps.close();
-            if (connection != null) connection.close();
-
-
+            //close the ps PreparedStatement
+            //close the connection Connection
         }
+
+    }
+
+    public static void displayAllCities() throws SQLException, ClassNotFoundException {
+
+        // load the MySQL Driver
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+
+        try (Connection connection = DriverManager.getConnection(basicDataSource.getConnectionString(), basicDataSource.getUsername(), basicDataSource.getPassword());
+             PreparedStatement ps = connection.prepareStatement("SELECT city FROM city where country_id");
+             ResultSet results = ps.executeQuery();
+        ) {
+            while (results.next()) {
+                String city = results.getString("city");
+                System.out.println(city);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            //close the resultset
+            //close the prepared statement
+            //close the connection
+        }
+
     }
 }
