@@ -24,31 +24,53 @@ public class Main {
         System.out.println(ColorCodes.BRIGHT_BLUE + "================================================" + ColorCodes.RESET);
 
         try (Scanner scanner = new Scanner(System.in)) {
-            // Step 1: Get actors by last name
-            System.out.print(ColorCodes.BRIGHT_GREEN + "\n🔍 Enter the last name of an actor you like: " + ColorCodes.RESET
-            + ColorCodes.BRIGHT_GREEN + "(e.g 'STALLONE', 'CRONYN', 'TEMPLE', 'PINKETT',MIRANDA):\n" + ColorCodes.RESET);
-            String lastName = scanner.nextLine().trim();
+            boolean continueProgram = true;
 
-            if (lastName.isEmpty()) {
-                System.out.println(ColorCodes.BRIGHT_RED + "❌ Last name cannot be empty!" + ColorCodes.RESET);
-                return;
+            while (continueProgram) {
+                // Step 1: Get actors by last name
+                System.out.print(ColorCodes.BRIGHT_GREEN + "\n🔍 Enter the last name of an actor you like: " + ColorCodes.RESET
+                        + ColorCodes.BRIGHT_GREEN + "(e.g 'STALLONE', 'CRONYN', 'TEMPLE', 'PINKETT',MIRANDA):\n" + ColorCodes.RESET);
+                String lastName = scanner.nextLine().trim();
+
+                if (lastName.isEmpty()) {
+                    System.out.println(ColorCodes.BRIGHT_RED + "❌ Last name cannot be empty!" + ColorCodes.RESET);
+                    continue; // Go back to the beginning of the loop
+                }
+
+                displayActorsByLastName(lastName);
+
+                // Step 2: Get movies by actor's full name
+                System.out.print(ColorCodes.BRIGHT_PURPLE + "\n🎭 Enter the first name of the actor: " + ColorCodes.RESET);
+                String firstName = scanner.nextLine().trim();
+
+                System.out.print(ColorCodes.BRIGHT_PURPLE + "🎭 Enter the last name of the actor: " + ColorCodes.RESET);
+                String actorLastName = scanner.nextLine().trim();
+
+                if (firstName.isEmpty() || actorLastName.isEmpty()) {
+                    System.out.println(ColorCodes.BRIGHT_RED + "❌ Both first name and last name are required!" + ColorCodes.RESET);
+                    continue; // Go back to the beginning of the loop
+                }
+
+                displayMoviesByActor(firstName, actorLastName);
+
+                // Ask if user wants to continue
+                boolean validChoice = false;
+                while (!validChoice) {
+                    System.out.print(ColorCodes.PURPLE + "\n🔄 Do you want to search for another actor? (y/n): " + ColorCodes.RESET);
+                    String userChoice = scanner.nextLine().trim().toLowerCase();
+
+                    if (userChoice.equals("y") || userChoice.equals("yes")) {
+                        validChoice = true;
+                        // continueProgram remains true, so the main loop continues
+                    } else if (userChoice.equals("n") || userChoice.equals("no")) {
+                        validChoice = true;
+                        continueProgram = false;
+                        System.out.println(ColorCodes.BRIGHT_GREEN + "✨ Thank you for using Sakila Movies Explorer!" + ColorCodes.RESET);
+                    } else {
+                        System.out.println(ColorCodes.BRIGHT_RED + "❌ Invalid choice! Please enter 'y' for yes or 'n' for no." + ColorCodes.RESET);
+                    }
+                }
             }
-
-            displayActorsByLastName(lastName);
-
-            // Step 2: Get movies by actor's full name
-            System.out.print(ColorCodes.BRIGHT_PURPLE + "\n🎭 Enter the first name of the actor: " + ColorCodes.RESET);
-            String firstName = scanner.nextLine().trim();
-
-            System.out.print(ColorCodes.BRIGHT_PURPLE + "🎭 Enter the last name of the actor: " + ColorCodes.RESET);
-            String actorLastName = scanner.nextLine().trim();
-
-            if (firstName.isEmpty() || actorLastName.isEmpty()) {
-                System.out.println(ColorCodes.BRIGHT_RED + "❌ Both first name and last name are required!" + ColorCodes.RESET);
-                return;
-            }
-
-            displayMoviesByActor(firstName, actorLastName);
 
         } catch (Exception e) {
             System.out.println(ColorCodes.BRIGHT_RED + "💥 An error occurred: " + e.getMessage() + ColorCodes.RESET);
@@ -155,7 +177,7 @@ public class Main {
                             ColorCodes.RESET + ColorCodes.BRIGHT_YELLOW + " (" + releaseYear + ")" + ColorCodes.RESET);
                     System.out.println(ColorCodes.CYAN + "   ID: " + ColorCodes.SNOW + filmId +
                             ColorCodes.CYAN + " | Length: " + ColorCodes.SNOW + length + " minutes" + ColorCodes.RESET);
-                    System.out.println(ColorCodes.LAVENDER + "   Description: " + ColorCodes.BRIGHT_WHITE + description + ColorCodes.RESET);
+                    System.out.println(ColorCodes.LAVENDER + "   Description: " + ColorCodes.GOLD + ColorCodes.BOLD + description + ColorCodes.RESET);
                     System.out.println(ColorCodes.BRIGHT_BLUE + "-".repeat(50) + ColorCodes.RESET);
                 }
 
